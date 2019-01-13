@@ -16,3 +16,4 @@ There are the following limitations:
 - Math must be inside ${ and }$
 - Four types of questions are supported: essay, single answer, multiple answers, numerical
 - No verbatim environments, listings, etc.; it's generally best to avoid fancy latex commands
+- File attachments are not supported; they have to be uploaded and set from within moodle
