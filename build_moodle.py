@@ -1,7 +1,9 @@
 import os
 import re
+import sys
 import base64
 import codecs
+import shutil
 import matplotlib.pyplot as plt
 try:
 	from StringIO import StringIO as SIO # for python 2
@@ -51,10 +53,18 @@ def zipfile_to_zip_base64(zip_path):
 	return "data:application/zip;base64," + encoded_string.decode('utf-8')
 
 if __name__ == '__main__':
-	texfile = 'questions.tex'#sys.argv[1]
+	# Create file paths
+	dirpath = os.path.dirname(sys.argv[1])
+	texfile = os.path.basename(sys.argv[1])
 	moodlefile = texfile[:-4] + '-moodle.xml'
 	newmoodlefile = texfile[:-4] + '-moodle-new.xml'
-#	os.system('xelatex ' + texfile)
+
+	# Compile file using xelatex
+	cwd = os.getcwd()
+	if not os.path.exists(os.path.join(dirpath, 'moodle.sty')):
+		shutil.copyfile('moodle.sty', os.path.join(dirpath, 'moodle.sty'))
+	os.chdir(dirpath)
+	os.system('xelatex ' + texfile)
 
 	# Find all images in tex
 	imagepaths = []
@@ -106,3 +116,8 @@ if __name__ == '__main__':
 						line = line.replace('STARTEMBEDDATA-' + eq + '-ENDEMBEDDATA', \
 								'<a href="' + zipfile_to_zip_base64(filename) + '" download="' + filename.split('/')[-1].split('\\')[-1] + '">' + linktext + '</a>')
 				outfile.write(line)
+
+	# Clean up by removing temporary files
+	shutil.copyfile(newmoodlefile, moodlefile)
+	os.remove(newmoodlefile)
+	os.chdir(cwd)
