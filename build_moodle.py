@@ -39,6 +39,11 @@ def image_to_png_base64(image_path):
 		encoded_string = base64.b64encode(image_file.read())
 	return "data:image/png;base64," + encoded_string.decode('utf-8')
 
+def zipfile_to_zip_base64(zip_path):
+	with open(zip_path, "rb") as zip_file:
+		encoded_string = base64.b64encode(zip_file.read())
+	return "data:application/zip;base64," + encoded_string.decode('utf-8')
+
 if __name__ == '__main__':
 	texfile = 'questions.tex'#sys.argv[1]
 	moodlefile = texfile[:-4] + '-moodle.xml'
@@ -68,6 +73,18 @@ if __name__ == '__main__':
 		with codecs.open(moodlefile, encoding='utf-8') as infile:
 			startdesc = False
 			for line in infile:
+				# Replace short answers with description questions
+				if 'type="shortanswer"' in line:
+					line = line.split('type="shortanswer"')[0] + 'type="description"' + line.split('type="shortanswer"')[1]
+					startdesc = True
+				elif startdesc:
+					if r'[-1.5cm]\color {white}' in line:
+						line = line.replace(r'[-1.5cm]\color {white}', '')
+					elif '</question>' in line:
+						startdesc = False
+					elif not ('name>' in line or ('<text>' in line and 'descriptionquestion' not in line) or 'questiontext' in line or \
+						 '<defaultgrade>' in line or '<generalfeedback' in line or '<penalty>' in line or '<hidden>' in line):
+						continue
 				# Replace images and equations
 				if '<IMG ' in line or '\(' in line:
 					if '<IMG ' in line:
@@ -75,17 +92,11 @@ if __name__ == '__main__':
 					if '\({' in line:
 						for eq in re.findall('\\\\\(\{(.+?)\}\\\\\)', line):
 							line = line.replace(r'\({' + eq + r'}\)', '<IMG  SRC="' + latex_equation_to_png_base64(next(equations)) + '">', 1)
-					outfile.write(line)
-				# Replace short answers with description questions
-				if 'type="shortanswer"' in line:
-					outfile.write(line.split('type="shortanswer"')[0] + 'type="description"' + line.split('type="shortanswer"')[1])
-					startdesc = True
-				if startdesc:
-					if '</question>' in line:
-						outfile.write(line)
-						startdesc = False
-					elif 'name>' in line or ('<text>' in line and 'descriptionquestion' not in line) or 'questiontext' in line or \
-						 '<defaultgrade>' in line or '<generalfeedback' in line or '<penalty>' in line or '<hidden>' in line:
-						outfile.write(line)
-				else:
-					outfile.write(line)
+				# Replace attachments
+				if 'STARTEMBEDDATA' in line:
+					for eq in re.findall('STARTEMBEDDATA-(.+?)-ENDEMBEDDATA', line):
+						filename = eq.split(',')[0].strip()
+						linktext = eq.split(',')[1].strip()
+						line = line.replace('STARTEMBEDDATA-' + eq + '-ENDEMBEDDATA', \
+								'<a href="' + zipfile_to_zip_base64(filename) + '" download="' + filename.split('/')[-1].split('\\')[-1] + '">' + linktext + '</a>')
+				outfile.write(line)
