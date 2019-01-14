@@ -35,11 +35,17 @@ def latex_equation_to_png_base64(formula):
 	return "data:image/png;base64," + encoded_string.decode('utf-8')
 
 def image_to_png_base64(image_path):
+	"""
+	Helper function that reads a png image file and converts it to base64 format
+	"""
 	with open(image_path, "rb") as image_file:
 		encoded_string = base64.b64encode(image_file.read())
 	return "data:image/png;base64," + encoded_string.decode('utf-8')
 
 def zipfile_to_zip_base64(zip_path):
+	"""
+	Helper function that reads a zip file and converts it to base64 format
+	"""
 	with open(zip_path, "rb") as zip_file:
 		encoded_string = base64.b64encode(zip_file.read())
 	return "data:application/zip;base64," + encoded_string.decode('utf-8')
@@ -78,8 +84,8 @@ if __name__ == '__main__':
 					line = line.split('type="shortanswer"')[0] + 'type="description"' + line.split('type="shortanswer"')[1]
 					startdesc = True
 				elif startdesc:
-					if r'[-1.5cm]\color {white}' in line:
-						line = line.replace(r'[-1.5cm]\color {white}', '')
+					if r'\color {white}' in line:
+						line = line.replace(r'\color {white}', '')
 					elif '</question>' in line:
 						startdesc = False
 					elif not ('name>' in line or ('<text>' in line and 'descriptionquestion' not in line) or 'questiontext' in line or \
