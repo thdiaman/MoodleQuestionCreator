@@ -109,11 +109,13 @@ if __name__ == '__main__':
 						for eq in re.findall('\\\\\(\{(.+?)\}\\\\\)', line):
 							line = line.replace(r'\({' + eq + r'}\)', '<IMG  SRC="' + latex_equation_to_png_base64(next(equations)) + '">', 1)
 				# Replace attachments
-				if 'STARTEMBEDDATA' in line:
-					for eq in re.findall('STARTEMBEDDATA-(.+?)-ENDEMBEDDATA', line):
+				if r'({{' in line:
+					print(line)
+					for eq in re.findall('\({{(.+?)}}\)', line):
+						print(eq)
 						filename = eq.split(',')[0].strip()
 						linktext = eq.split(',')[1].strip()
-						line = line.replace('STARTEMBEDDATA-' + eq + '-ENDEMBEDDATA', \
+						line = line.replace(r'({{' + eq + r'}})', \
 								'<a href="' + zipfile_to_zip_base64(filename) + '" download="' + filename.split('/')[-1].split('\\')[-1] + '">' + linktext + '</a>')
 				outfile.write(line)
 

@@ -16,4 +16,4 @@ There are the following limitations:
 - Math must be inside ${ and }$
 - Four types of questions are supported: essay, single answer, multiple answers, numerical
 - No verbatim environments, listings, etc.; it's generally best to avoid fancy latex commands
-- File attachment support is very experimental; it supports only zip files and has not been tested with different browsers
+- File attachment support (using the format ({{filename, text_of_link)}} for defining it) is very experimental; it supports only zip files and has not been tested with different browsers
