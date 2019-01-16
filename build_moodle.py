@@ -52,6 +52,14 @@ def zipfile_to_zip_base64(zip_path):
 		encoded_string = base64.b64encode(zip_file.read())
 	return "data:application/zip;base64," + encoded_string.decode('utf-8')
 
+def codefile_to_monospace_html(codefile):
+	"""
+	Helper function that converts a file of code to monospace html
+	"""
+	with open(codefile, "r") as infile:
+		code = infile.read()
+	return '<pre style="border: 0; background-color: transparent;">' + code + "</pre>"
+
 if __name__ == '__main__':
 	# Create file paths
 	dirpath = os.path.dirname(sys.argv[1])
@@ -106,6 +114,15 @@ if __name__ == '__main__':
 					if '\({' in line:
 						for eq in re.findall('\\\\\(\{(.+?)\}\\\\\)', line):
 							line = line.replace(r'\({' + eq + r'}\)', '<IMG  SRC="' + latex_equation_to_png_base64(next(equations)) + '">', 1)
+				# Replace code
+				if r'\texttt' in line:
+					for eq in re.findall('\\\\texttt \{(.+?)\}', line):
+						line = line.replace(r'\texttt {' + eq + r'}', \
+								'<span style="font-family: Monaco,Menlo,Consolas,\'Courier New\',monospace;">' + eq + '</span>')
+				# Replace multiline code
+				if r'\lstinputlisting' in line:
+					for eq in re.findall('\\\\lstinputlisting \{(.+?)\}', line):
+						line = line.replace(r'\lstinputlisting {' + eq + r'}', codefile_to_monospace_html(eq))
 				# Replace attachments
 				if r'({{' in line:
 					for eq in re.findall('\({{(.+?)}}\)', line):

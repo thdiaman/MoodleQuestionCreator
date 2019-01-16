@@ -6,6 +6,8 @@
 \usepackage{polyglossia}
 \setmainfont{Cambria}
 \setromanfont{Times New Roman}
+\setsansfont{Arial}
+\setmonofont{Consolas}
 
 \setmainlanguage[numerals=arabic]{greek}
 \setotherlanguage{english}
@@ -13,6 +15,7 @@
 
 \usepackage{moodle}
 \usepackage{graphicx}
+\usepackage{listings}
 
 \begin{document}
 
@@ -42,8 +45,9 @@ Which of the following numbers are even?
 \end{multichoice}
 
 \begin{numerical}{Sample numerical question}
-What is the result of ${\frac{1 + 1}{2}}$?
-\item 1
+What is the result of the python function \texttt{func = lambda x: 2 * x} for input x equal to 1? Note that this function is the same as below:
+\lstinputlisting{code.txt}
+\item 2
 \end{numerical}
 
 \begin{essay}{Sample essay question}
