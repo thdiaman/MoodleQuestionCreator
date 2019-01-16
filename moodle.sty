@@ -569,7 +569,7 @@
   \egroup
 }%
 
-\NewEnviron{desc}[2][]{%
+\RenewEnviron{description}[2][]{%
   \bgroup
     \setkeys{moodle}{#1,questionname={#2}}%
     \expandafter\gatheritems\expandafter{\BODY}%
@@ -2173,6 +2173,11 @@
     }{}%
   \fi
 }
+
+\let\singlechoice\multi
+\let\endsinglechoice\endmulti
+\def\multichoice{\multi[multiple]}
+\let\endmultichoice\endmulti
 
 \endinput
 %%
