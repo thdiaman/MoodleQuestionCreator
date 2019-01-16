@@ -123,6 +123,13 @@ if __name__ == '__main__':
 				if r'\lstinputlisting' in line:
 					for eq in re.findall('\\\\lstinputlisting \{(.+?)\}', line):
 						line = line.replace(r'\lstinputlisting {' + eq + r'}', codefile_to_monospace_html(eq))
+				# Replace text manipulations
+				if r'<SPAN STYLE=&rdquo;text-decoration: underline;&rdquo;>' in line:
+					for eq in re.findall('<SPAN STYLE=&rdquo;text-decoration: underline;&rdquo;>(.+?)</SPAN>', line):
+						line = line.replace(r'<SPAN STYLE=&rdquo;text-decoration: underline;&rdquo;>' + eq + r'</SPAN>', '<u>' + eq + '</u>')
+				if r'\textit' in line:
+					for eq in re.findall('\\\\textit \{(.+?)\}', line):
+						line = line.replace(r'\textit {' + eq + r'}', '<i>' + eq + '</i>')
 				# Replace attachments
 				if r'({{' in line:
 					for eq in re.findall('\({{(.+?)}}\)', line):
