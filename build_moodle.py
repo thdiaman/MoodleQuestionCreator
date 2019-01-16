@@ -90,17 +90,15 @@ if __name__ == '__main__':
 			startdesc = False
 			for line in infile:
 				# Replace short answers with description questions
-				if 'type="shortanswer"' in line:
-					line = line.split('type="shortanswer"')[0] + 'type="description"' + line.split('type="shortanswer"')[1]
+				if 'type="description"' in line:
 					startdesc = True
 				elif startdesc:
-					if r'\color {white}' in line:
-						line = line.replace(r'\color {white}', '')
-					elif '</question>' in line:
+					if '</question>' in line:
 						startdesc = False
-					elif not ('name>' in line or ('<text>' in line and 'descriptionquestion' not in line) or 'questiontext' in line or \
-						 '<defaultgrade>' in line or '<generalfeedback' in line or '<penalty>' in line or '<hidden>' in line):
-						continue
+					elif '<defaultgrade>' in line:
+						line = line.replace('1.0', '0.0000000')
+					elif '<penalty>' in line:
+						line = line.replace('0.1000000', '0.0000000')
 				# Replace images and equations
 				if '<IMG ' in line or '\(' in line:
 					if '<IMG ' in line:
@@ -110,9 +108,7 @@ if __name__ == '__main__':
 							line = line.replace(r'\({' + eq + r'}\)', '<IMG  SRC="' + latex_equation_to_png_base64(next(equations)) + '">', 1)
 				# Replace attachments
 				if r'({{' in line:
-					print(line)
 					for eq in re.findall('\({{(.+?)}}\)', line):
-						print(eq)
 						filename = eq.split(',')[0].strip()
 						linktext = eq.split(',')[1].strip()
 						line = line.replace(r'({{' + eq + r'}})', \

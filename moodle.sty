@@ -569,6 +569,43 @@
   \egroup
 }%
 
+\NewEnviron{desc}[2][]{%
+  \bgroup
+    \setkeys{moodle}{#1,questionname={#2}}%
+    \expandafter\gatheritems\expandafter{\BODY}%
+    \let\moodle@questionheader=\gatheredheader
+    %First, the LaTeX processing.
+      \item \textbf{\moodle@questionname}\par
+      \noindent
+      \moodle@questionheader
+      \csname moodle@essay@latexprocessing\endcsname
+    %Now, writing information to memory.
+    \@moodle@ifgeneratexml{%
+      \xa\questiontext\xa{\moodle@questionheader}% Save the question text.
+      \bgroup
+        \gdef\moodle@answers@xml{}%
+        %
+        \ifnum\c@numgathereditems=0\relax
+          \addto@xml[2]\moodle@answers@xml{<graderinfo format="html"><text/></graderinfo>}%
+        \else
+          \addto@xml[2]\moodle@answers@xml{<graderinfo format="html"><text><![CDATA[}%
+          \ifnum\c@numgathereditems>1\relax
+            \addto@xml[4]\moodle@answers@xml{<ul>}%
+          \fi
+          \loopthroughitemswithcommand{\moodle@savegraderinfo}%
+          \ifnum\c@numgathereditems>1\relax
+            \addto@xml[4]\moodle@answers@xml{</ul>}%
+          \fi
+          \addto@xml[2]\moodle@answers@xml{]]></text></graderinfo>}%
+        \fi
+        %
+        \passvalueaftergroup{\moodle@answers@xml}%
+      \egroup
+      \writedescquestion
+    }{}%
+  \egroup
+}%
+
 %%%% TO DO
 %%%% To make essay work will be tough.
 %%%% Every line from \ifnum\c@numgathereditems=0\relax through its \else and \fi,
@@ -602,6 +639,12 @@
 %%%%      }{}%
 %%%% The \@ifundefined lines should automatically define the
 %%%% \...@preamble \...@postamble macros to be \relax if they don't exist already.
+
+\gdef\writedescquestion{%
+  \writetomoodle{<question type="description">}%
+    \moodle@writecommondata%
+  \writetomoodle{</question>}%
+}%
 
 \gdef\writeessayquestion{%
   \writetomoodle{<question type="essay">}%
