@@ -116,9 +116,14 @@ if __name__ == '__main__':
 							line = line.replace(r'\({' + eq + r'}\)', '<IMG  SRC="' + latex_equation_to_png_base64(next(equations)) + '">', 1)
 				# Replace code
 				if r'\texttt' in line:
-					for eq in re.findall('\\\\texttt \{(.+?)\}', line):
-						line = line.replace(r'\texttt {' + eq + r'}', \
-								'<span style="font-family: Monaco,Menlo,Consolas,\'Courier New\',monospace;">' + eq + '</span>')
+					for eq in re.findall('\\\\texttt (.+)', line):
+						par = 0
+						for ind, i in enumerate(eq):
+							par = par + 1 if i == '{' else (par - 1 if i == '}' else par)
+							if par == 0:
+								break
+						line = line.replace(r'\texttt ' + eq[:ind+1], \
+								'<span style="font-family: Monaco,Menlo,Consolas,\'Courier New\',monospace;">' + eq[1:ind] + '</span>')
 				# Replace multiline code
 				if r'\lstinputlisting' in line:
 					for eq in re.findall('\\\\lstinputlisting \{(.+?)\}', line):
@@ -128,8 +133,13 @@ if __name__ == '__main__':
 					for eq in re.findall('<SPAN STYLE=&rdquo;text-decoration: underline;&rdquo;>(.+?)</SPAN>', line):
 						line = line.replace(r'<SPAN STYLE=&rdquo;text-decoration: underline;&rdquo;>' + eq + r'</SPAN>', '<u>' + eq + '</u>')
 				if r'\textit' in line:
-					for eq in re.findall('\\\\textit \{(.+?)\}', line):
-						line = line.replace(r'\textit {' + eq + r'}', '<i>' + eq + '</i>')
+					for eq in re.findall('\\\\textit (.+)', line):
+						par = 0
+						for ind, i in enumerate(eq):
+							par = par + 1 if i == '{' else (par - 1 if i == '}' else par)
+							if par == 0:
+								break
+						line = line.replace(r'\textit ' + eq[:ind+1], '<i>' + eq[1:ind] + '</i>')
 				# Replace attachments
 				if r'({{' in line:
 					for eq in re.findall('\({{(.+?)}}\)', line):
