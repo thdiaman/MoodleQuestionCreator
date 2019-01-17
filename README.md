@@ -12,6 +12,7 @@ Perform the following steps:
 
 # Limitations
 There are the following limitations:
+- The last answer in a question should be \item{} instead of \item so that all text formattings are parsed correctly
 - Only png images are supported
 - Math must be inside ${ and }$
 - Verbatim text is either single-line using \texttt{} or multi-line reading from file using \lstinputlisting{}
