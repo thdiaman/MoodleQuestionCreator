@@ -116,7 +116,9 @@ if __name__ == '__main__':
 							line = line.replace(r'\({' + eq + r'}\)', '<IMG  SRC="' + latex_equation_to_png_base64(next(equations)) + '">', 1)
 				# Replace code
 				if r'\texttt' in line:
-					for eq in re.findall('\\\\texttt (.+)', line):
+					replacements = []
+					while r'\texttt ' in line:
+						eq = re.findall('\\\\texttt (.+)', line)[0]
 						par = 0
 						for ind, i in enumerate(eq):
 							par = par + 1 if i == '{' else (par - 1 if i == '}' else par)
@@ -133,7 +135,8 @@ if __name__ == '__main__':
 					for eq in re.findall('<SPAN STYLE=&rdquo;text-decoration: underline;&rdquo;>(.+?)</SPAN>', line):
 						line = line.replace(r'<SPAN STYLE=&rdquo;text-decoration: underline;&rdquo;>' + eq + r'</SPAN>', '<u>' + eq + '</u>')
 				if r'\textit' in line:
-					for eq in re.findall('\\\\textit (.+)', line):
+					while r'\textit ' in line:
+						eq = re.findall('\\\\textit (.+)', line)[0]
 						par = 0
 						for ind, i in enumerate(eq):
 							par = par + 1 if i == '{' else (par - 1 if i == '}' else par)
