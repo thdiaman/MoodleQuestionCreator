@@ -2179,6 +2179,9 @@
 \def\multichoice{\multi[multiple]}
 \let\endmultichoice\endmulti
 
+\let\ortexttt\texttt
+\renewcommand{\texttt}[2][language]{\ortexttt{#2}}
+
 \endinput
 %%
 %% End of file `moodle.sty'.

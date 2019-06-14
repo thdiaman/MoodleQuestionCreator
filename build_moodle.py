@@ -4,7 +4,10 @@ import sys
 import base64
 import codecs
 import shutil
+from pygments import highlight
 import matplotlib.pyplot as plt
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import HtmlFormatter
 try:
 	from StringIO import StringIO as SIO # for python 2
 except ImportError:
@@ -52,15 +55,36 @@ def zipfile_to_zip_base64(zip_path):
 		encoded_string = base64.b64encode(zip_file.read())
 	return "data:application/zip;base64," + encoded_string.decode('utf-8')
 
-def codefile_to_monospace_html(codefile):
+def highlight_code(code, language = None):
+	"""
+	Helper function that highlights code as html
+	"""
+	try:
+		return highlight(code, get_lexer_by_name(language), HtmlFormatter(nowrap=True, noclasses=True))
+	except:
+		return code
+
+def codefile_to_monospace_html(codefile, codelang):
 	"""
 	Helper function that converts a file of code to monospace html
 	"""
 	with open(codefile, "r") as infile:
 		code = infile.read()
-	return '<pre style="border: 0; background-color: transparent;">' + code + "</pre>"
+	return '<pre style="border: 0; background-color: transparent;">' + highlight_code(code, codelang) + "</pre>"
+
+def get_position_of_text_between(text, left, right):
+	"""
+	Helper function that extracts the first block from the text between left and right characters
+	"""
+	par = 0
+	for ind, i in enumerate(text):
+		par = par + 1 if i == left else (par - 1 if i == right else par)
+		if ind > text.find(left) and par == 0:
+			break
+	return text.find(left) + 1, ind
 
 if __name__ == '__main__':
+	sys.argv.append('./questions.tex')
 	# Create file paths
 	dirpath = os.path.dirname(sys.argv[1])
 	texfile = os.path.basename(sys.argv[1])
@@ -119,17 +143,21 @@ if __name__ == '__main__':
 					replacements = []
 					while r'\texttt ' in line:
 						eq = re.findall('\\\\texttt (.+)', line)[0]
-						par = 0
-						for ind, i in enumerate(eq):
-							par = par + 1 if i == '{' else (par - 1 if i == '}' else par)
-							if par == 0:
-								break
-						line = line.replace(r'\texttt ' + eq[:ind+1], \
-								'<span style="font-family: Monaco,Menlo,Consolas,\'Courier New\',monospace;">' + eq[1:ind] + '</span>')
+						left, right = get_position_of_text_between(eq, '[', ']')
+						eqlang = eq[left:right].split('=')[-1].lstrip().strip()
+						left, right = get_position_of_text_between(eq, '{', '}')
+						eqcode = eq[left:right]
+						line = line.replace(r'\texttt ' + eq[:right+1], \
+								'<span style="font-family: Monaco,Menlo,Consolas,\'Courier New\',monospace;">' + highlight_code(eqcode, eqlang) + '</span>')
 				# Replace multiline code
 				if r'\lstinputlisting' in line:
-					for eq in re.findall('\\\\lstinputlisting \{(.+?)\}', line):
-						line = line.replace(r'\lstinputlisting {' + eq + r'}', codefile_to_monospace_html(eq))
+					while r'\lstinputlisting ' in line:
+						eq = re.findall('\\\\lstinputlisting (.+)', line)[0]
+						left, right = get_position_of_text_between(eq, '[', ']')
+						eqlang = eq[left:right].split('=')[-1].lstrip().strip()
+						left, right = get_position_of_text_between(eq, '{', '}')
+						eqcode = eq[left:right]
+						line = line.replace(r'\lstinputlisting ' + eq[:right+1], codefile_to_monospace_html(eqcode, eqlang))
 				# Replace text manipulations
 				if r'<SPAN STYLE=&rdquo;text-decoration: underline;&rdquo;>' in line:
 					for eq in re.findall('<SPAN STYLE=&rdquo;text-decoration: underline;&rdquo;>(.+?)</SPAN>', line):
@@ -137,12 +165,9 @@ if __name__ == '__main__':
 				if r'\textit' in line:
 					while r'\textit ' in line:
 						eq = re.findall('\\\\textit (.+)', line)[0]
-						par = 0
-						for ind, i in enumerate(eq):
-							par = par + 1 if i == '{' else (par - 1 if i == '}' else par)
-							if par == 0:
-								break
-						line = line.replace(r'\textit ' + eq[:ind+1], '<i>' + eq[1:ind] + '</i>')
+						left, right = get_position_of_text_between(eq, '{', '}')
+						eqtext = eq[left:right]
+						line = line.replace(r'\textit ' + eq[:right+1], '<i>' + eqtext + '</i>')
 				# Replace attachments
 				if r'({{' in line:
 					for eq in re.findall('\({{(.+?)}}\)', line):
