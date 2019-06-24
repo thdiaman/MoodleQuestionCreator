@@ -59,6 +59,7 @@ def highlight_code(code, language = None, to_image = False):
 	"""
 	Helper function that highlights code as html
 	"""
+	code = code.replace('&rsquo;', '\'').replace('&rdquo;', '"')
 	try:
 		if to_image:
 			codeimage = highlight(code, get_lexer_by_name(language), ImageFormatter(line_numbers = False, line_number_pad=16, hl_color='white', hl_lines=list(range(len(code.split('\n')) + 2))))
