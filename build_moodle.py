@@ -7,7 +7,7 @@ import shutil
 from pygments import highlight
 import matplotlib.pyplot as plt
 from pygments.lexers import get_lexer_by_name
-from pygments.formatters import HtmlFormatter
+from pygments.formatters import HtmlFormatter, ImageFormatter
 try:
 	from StringIO import StringIO as SIO # for python 2
 except ImportError:
@@ -55,22 +55,30 @@ def zipfile_to_zip_base64(zip_path):
 		encoded_string = base64.b64encode(zip_file.read())
 	return "data:application/zip;base64," + encoded_string.decode('utf-8')
 
-def highlight_code(code, language = None):
+def highlight_code(code, language = None, to_image = False):
 	"""
 	Helper function that highlights code as html
 	"""
 	try:
-		return highlight(code, get_lexer_by_name(language), HtmlFormatter(nowrap=True, noclasses=True))
+		if to_image:
+			codeimage = highlight(code, get_lexer_by_name(language), ImageFormatter(line_numbers = False, line_number_pad=16, hl_color='white', hl_lines=list(range(len(code.split('\n')) + 2))))
+			encoded_string = base64.b64encode(codeimage)
+			return "data:application/zip;base64," + encoded_string.decode('utf-8')
+		else:
+			return highlight(code, get_lexer_by_name(language), HtmlFormatter(nowrap=True, noclasses=True))
 	except:
 		return code
 
-def codefile_to_monospace_html(codefile, codelang):
+def codefile_to_monospace_html(codefile, codelang, to_image = False):
 	"""
 	Helper function that converts a file of code to monospace html
 	"""
 	with open(codefile, "r") as infile:
 		code = infile.read()
-	return '<pre style="border: 0; background-color: transparent;">' + highlight_code(code, codelang) + "</pre>"
+	if to_image:
+		return '<BR/><IMG  SRC="' + highlight_code(code, codelang, to_image) + '"><BR/>'
+	else:
+		return '<pre style="border: 0; background-color: transparent;">' + highlight_code(code, codelang) + "</pre>"
 
 def get_position_of_text_between(text, left, right):
 	"""
