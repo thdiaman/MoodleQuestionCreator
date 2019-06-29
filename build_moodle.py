@@ -93,7 +93,6 @@ def get_position_of_text_between(text, left, right):
 	return text.find(left) + 1, ind
 
 if __name__ == '__main__':
-	sys.argv.append('./questions.tex')
 	# Create file paths
 	dirpath = os.path.dirname(sys.argv[1])
 	texfile = os.path.basename(sys.argv[1])
