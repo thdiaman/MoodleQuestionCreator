@@ -129,7 +129,7 @@ if __name__ == '__main__':
 		with codecs.open(moodlefile, encoding='utf-8') as infile:
 			startdesc = False
 			for line in infile:
-				# Replace short answers with description questions
+				# Fix description questions (originally represented as short answers)
 				if 'type="description"' in line:
 					startdesc = True
 				elif startdesc:

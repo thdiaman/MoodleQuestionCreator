@@ -12,10 +12,10 @@ Perform the following steps:
 
 # Limitations
 There are the following limitations:
-- The last answer in a question should be \item{} instead of \item so that all text formattings are parsed correctly
+- The last answer in a question should be `\item{}` instead of `\item` so that all text formattings are parsed correctly
 - Only png images are supported
-- Math must be inside ${ and }$
-- Verbatim text is either single-line using \texttt{} or multi-line reading from file using \lstinputlisting{}
+- Math must be inside `${` and `}$`
+- Verbatim text is either single-line using `\texttt{}` or multi-line reading from file using `\lstinputlisting{}`
 - Four types of questions are supported: essay, single answer, multiple answers, numerical
 - No verbatim environments, etc.; it's generally best to avoid fancy latex commands
-- File attachment support (using the format ({{filename, text_of_link)}} for defining it) is very experimental; it supports only zip files and has not been tested with different browsers
+- File attachment support (using the format `({{filename, text_of_link}})` for defining it) is very experimental; it supports only zip files and has not been tested with different browsers
