@@ -176,6 +176,9 @@ if __name__ == '__main__':
 						left, right = get_position_of_text_between(eq, '{', '}')
 						eqtext = eq[left:right]
 						line = line.replace(r'\textit ' + eq[:right+1], '<i>' + eqtext + '</i>')
+				# Replace latex special characters
+				if r'\%' in line:
+					line = line.replace(r'\%', r'%')
 				# Replace attachments
 				if r'({{' in line:
 					for eq in re.findall('\({{(.+?)}}\)', line):
