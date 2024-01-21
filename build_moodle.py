@@ -66,7 +66,7 @@ def highlight_code(code, language = None, to_image = False):
 			encoded_string = base64.b64encode(codeimage)
 			return "data:application/zip;base64," + encoded_string.decode('utf-8')
 		else:
-			return highlight(code, get_lexer_by_name(language), HtmlFormatter(nowrap=True, noclasses=True))
+			return highlight(code, get_lexer_by_name(language), HtmlFormatter(nowrap=True, noclasses=True)).replace("> <", ">&nbsp;<").rstrip()
 	except:
 		return code
 
