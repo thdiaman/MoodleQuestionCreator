@@ -179,6 +179,8 @@ if __name__ == '__main__':
 				# Replace latex special characters
 				if r'\%' in line:
 					line = line.replace(r'\%', r'%')
+				if r'\_' in line:
+					line = line.replace(r'\_', r'_')
 				# Replace attachments
 				if r'({{' in line:
 					for eq in re.findall('\({{(.+?)}}\)', line):
